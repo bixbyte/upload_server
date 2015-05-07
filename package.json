@@ -1,0 +1,17 @@
+{
+  "name": "upload_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "mandrill-api": "^1.0.45",
+    "node-mandrill": "^1.0.1",
+    "tar.gz": "^0.1.1"
+  }
+}
