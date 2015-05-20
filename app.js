@@ -20,7 +20,7 @@ for ( var k in interfaces ){
     }  
 }
 
- server_addr = (server_addr[0] === undefined )? "localhost" : server_addr[0]
+ server_addr = (server_addr[0] === undefined )? "localhost" : server_addr[0];
 
 /* Simple logging Mechanism */
 function log($message) {
@@ -75,7 +75,7 @@ function errMail($message, $subject) {
             "Reply-To": "noreply@bixbyte.cf"
         },
         "important": true,
-        "track_opens": true,
+        "track_opens": true
     };
 
     mandrill_client.messages.send({
@@ -122,6 +122,7 @@ app.route("/gtel/api/photo").all(function (req, res) {
         /* Deny anonymous users access to the system */
 
         /* Inform admin of emminent security threat */
+        log(ip + " tried to hack you @ the gtel photo app!\n\n TIMESTAMP: " + Date());
         errMail(ip + " tried to hack you @ the gtel photo app!\n\n TIMESTAMP: " + Date());
 
         /* Redirect the potential hacker */
@@ -157,7 +158,7 @@ app.route("/gtel/api/photo").all(function (req, res) {
                     errMail("The photo album application failed to create an album directory ( " + g_album + " ) for the user {" + g_user + "} \n\n Reason: \n" + err);
                     log("ERR: COULD NOT CREATE THE 'album' { " + g_album + " } DIRECTORY FOR USER '" + g_user + "'\nREASON: " + err);
                 }
-            })
+            });
         }
 
         procIt(req, res);
@@ -179,16 +180,18 @@ app.route('/done/:user/:album').all(function (req, res) {
     if (typeof (g_user) === "undefined" || typeof (g_album) === "undefined") {
 
         log("ERR: FAILED TO CAPTURE USER OR ALBUM NAME");
+        res.send( main.makeResponse("ERROR", "FAILED TO CAPTURE USER AND ALBUM DATA. PLEASE TRY AGAIN.", "") );
 
     } else {
 
          /* Zip and Mail the file to the relevant party */
          packageAlbum(g_user, g_album);
-        res.redirect("/index.html");
+         res.send( main.makeResponse("SUCCESS", "SUCCESSFULLY REQUESTED ALBUM PRINT", "")  );
         
     }
 
 });
+
 
 /* Online album contents viewer */
 app.route("/admin/:path").all(function (req, res) {    
@@ -284,7 +287,7 @@ function procIt(req, res ) {
 
             log("Uploading single image.");
 
-            /* aproove file types */
+            /* approve file types */
             if (isValidType(gtel_upload.mimetype, gtel_upload.path)) {
 
                 var tmp_path = gtel_upload.path;
@@ -416,6 +419,7 @@ function mail( g_user, g_album ){
     /* Email the zipped file to the administrator for processing */
     var mypath = encodeURI("http://"+server_addr+":"+port+"/admin/"+g_user+"_"+g_album+".tar.gz");
    
+    /* The actual message Template */
     var message = {
         "html" :  '<table style="background:white; color:white; margin: 0 auto; height:400px;" width="70%" ><tr style="background:black; color: white; max-height:100px !important;"><td align="center"><img src="http://'+server_addr+':'+ port +'/logo.png" style="left:0px;  "><h1 style="color:white;"> Bixbyte </h1> </td></tr><tr style="background:black; min-height: 300px; color: white; text-align: justified;"><td style=" padding: 10px;"><p>The User <b>' + g_user + '</b> requested the printing of the album <b>' + g_album + '</b>. </p > <br><br> <div style="padding:3px; border-radius:4px; background: teal; text-align: center;">  <a style=" color:#2135ed; text-decoration:none;" href="'+ mypath + '">Download ' + g_user+'_'+g_album+'.tar.gz </a> </div> </td></tr><tr style="background:black; text: white; max-height:100px;"><td align="center">P.O BOX 49599 - 00100, Nairobi Kenya</td></tr></table>',
         "text": "The User " + g_user + " requested the printing of the album '" + g_album + "' \n\nYou can download it at " + mypath,
@@ -437,10 +441,12 @@ function mail( g_user, g_album ){
                                     */
     };
 
+    /* Set up Optional Properties */
     var async = false;
     var ip_pool = "Main Pool";
     var send_at = "example send_at";
 
+    /*  */
     mandrill_client.messages.send({
         "message": message,
         "async": async

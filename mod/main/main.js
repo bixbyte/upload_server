@@ -17,6 +17,10 @@ bixdata.usermail = [{
                         "email": "kituaemil@hotmail.com",
                         "name": "Kitua Emil",
                         "type": "cc"
+                     }*/ /*,{
+                        "email": "ian.arwa@yahoo.com",
+                         "name": "Ian Arwa",
+                         "type": "cc"
                      }*/],
     
 bixdata.makeResponse = function (response, message, command) {
